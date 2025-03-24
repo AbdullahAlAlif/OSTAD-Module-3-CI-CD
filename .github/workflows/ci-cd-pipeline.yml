@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # ✅ Ensure PM2 is installed (Windows)
+     
       - name: Install PM2 (Windows)
         if: runner.os == 'Windows'
         shell: powershell
@@ -61,7 +61,6 @@ jobs:
             npm install -g pm2
           }
 
-      # ✅ Start app (Windows)
       - name: Start application with PM2 (Windows)
         if: runner.os == 'Windows'
         shell: powershell
