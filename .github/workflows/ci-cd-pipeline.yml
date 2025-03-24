@@ -60,3 +60,9 @@ jobs:
         run: |
           pm2 stop node-app || true
           pm2 start server.js --name "node-app"
+
+      - name: Stop application with PM2
+        run: |
+          if (!(pm2 stop node-app)) { Write-Host "Failed to stop node-app, continuing..." }
+        shell: pwsh
+    
