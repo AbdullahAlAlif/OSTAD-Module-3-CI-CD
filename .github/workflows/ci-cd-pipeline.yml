@@ -52,8 +52,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Ensure PM2 is installed
-        shell: pwsh
+      # Ensure PM2 is installed correctly for Windows and Linux
+      - name: Install PM2 (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
           if (-not (Get-Command pm2 -ErrorAction SilentlyContinue)) {
             npm install -g pm2
@@ -61,11 +63,18 @@ jobs:
             Write-Host "PM2 is already installed."
           }
 
-      - name: Restart application with PM2
-        shell: pwsh
+      - name: Install PM2 (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
-          if (pm2 list | Select-String "node-app") {
-            pm2 restart node-app
-          } else {
-            pm2 start server.js --name "node-app"
-          }
+          if ! command -v pm2 &> /dev/null; then
+            npm install -g pm2
+          else
+            echo "PM2 is already installed."
+          fi
+
+      - name: Start application with PM2
+        shell: bash
+        run: |
+          pm2 stop node-app || echo "App not running, proceeding to start it again"
+          pm2 start server.js --name "node-app"
