@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     needs: test
-    runs-on: [self-hosted, windows]
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -47,19 +47,15 @@ jobs:
           name: test-results
 
       - name: Display test results
-        run: Get-Content test-results.txt
-        shell: pwsh
+        run: cat test-results.txt
 
       - name: Install dependencies
         run: npm install
-        shell: pwsh
 
       - name: Install PM2 (if not installed)
         run: npm install -g pm2
-        shell: pwsh
 
       - name: Start application with PM2
         run: |
-          pm2 stop node-app; if ($LASTEXITCODE -ne 0) { Write-Host "Failed to stop node-app, continuing..." }
+          pm2 stop node-app || true
           pm2 start server.js --name "node-app"
-        shell: pwsh
