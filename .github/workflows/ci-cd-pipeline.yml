@@ -1,4 +1,4 @@
-﻿name: CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -37,7 +37,6 @@ jobs:
     needs: test
     runs-on: [self-hosted, windows]
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,11 +57,6 @@ jobs:
 
       - name: Start application with PM2
         run: |
-          pm2 stop node-app || true
+          pm2 stop node-app; if ($LASTEXITCODE -ne 0) { Write-Host "Failed to stop node-app, continuing..." }
           pm2 start server.js --name "node-app"
-
-      - name: Stop application with PM2
-        run: |
-          if (!(pm2 stop node-app)) { Write-Host "Failed to stop node-app, continuing..." }
         shell: pwsh
-    
