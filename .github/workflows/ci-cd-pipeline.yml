@@ -52,40 +52,40 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Ensure PM2 is installed for Windows
+      
       - name: Install PM2 (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
           if (-not (Get-Command pm2 -ErrorAction SilentlyContinue)) {
             npm install -g pm2
-          } else {
-            Write-Host "PM2 is already installed."
           }
 
-      # Ensure PM2 is installed for Linux/macOS
+    
       - name: Install PM2 (Linux/macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
           if ! command -v pm2 &> /dev/null; then
             npm install -g pm2
-          else
-            echo "PM2 is already installed."
           fi
 
-      # ✅ Start app on Windows
+      
       - name: Start application with PM2 (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
+          cd "${{ github.workspace }}"  # Ensure correct directory
+          if (!(Test-Path server.js)) { Write-Host "ERROR: server.js not found!"; exit 1 }
           pm2 stop node-app; if ($LASTEXITCODE -ne 0) { Write-Host "App not running, proceeding to start it again" }
           pm2 start server.js --name "node-app"
 
-      # ✅ Start app on Linux/macOS
+      
       - name: Start application with PM2 (Linux/macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          cd "${{ github.workspace }}"  # Ensure correct directory
+          if [ ! -f server.js ]; then echo "ERROR: server.js not found!"; exit 1; fi
           pm2 stop node-app || echo "App not running, proceeding to start it again"
           pm2 start server.js --name "node-app"
